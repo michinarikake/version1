@@ -94,96 +94,103 @@ void right_rotate( int kakudo ) {
   int t = difference / omega;
 
   while (abs(theta - theta0 - kakudo) > 5) {
-
-    if ( theta - theta0 - kakudo > 0) {
-      analogWrite( PWMb, 249 );
-      analogWrite( PWMa, 254 );
-      digitalWrite(motor11, LOW);
-      digitalWrite(motor22, HIGH);
-      digitalWrite(motor12, HIGH);
-      digitalWrite(motor21, LOW);
-      delay(t);
-
-      digitalWrite(motor12, LOW);
-      digitalWrite(motor22, LOW);
-    }
-    else {
-      analogWrite( PWMb, 249 );
-      analogWrite( PWMa, 254 );
-      digitalWrite(motor11, HIGH);
-      digitalWrite(motor22, LOW);
-      digitalWrite(motor12, LOW);
-      digitalWrite(motor21, HIGH);
-      delay(t);
-
-      digitalWrite(motor11, LOW);
-      digitalWrite(motor21, LOW);
-
-    }
-  }
-}
-
-void left_rotate( int kakudo ) {
-  int theta0 = qmc5883();
-  int theta = theta0;
-  unsigned long microt = 0;
-  microt = millis();
-  analogWrite( PWMb, 249 );
-  analogWrite( PWMa, 254 );
-  digitalWrite(motor11, LOW);
-  digitalWrite(motor22, HIGH);
-  digitalWrite(motor12, HIGH);
-  digitalWrite(motor21, LOW);
-  while (theta0 - theta < kakudo) {
-    if (qmc5883() > theta0) {
-      theta = qmc5883() - 360;
+    if (qmc5883() < theta0) {
+      theta = qmc5883() + 360;
+      Serial.println(theta);
     }
     else {
       theta = qmc5883();
+      Serial.println(theta);
+    }
+      if ( theta - theta0 - kakudo > 0) {
+        analogWrite( PWMb, 249 );
+        analogWrite( PWMa, 254 );
+        digitalWrite(motor11, LOW);
+        digitalWrite(motor22, HIGH);
+        digitalWrite(motor12, HIGH);
+        digitalWrite(motor21, LOW);
+        delay(t);
+
+        digitalWrite(motor12, LOW);
+        digitalWrite(motor22, LOW);
+      }
+      else {
+        analogWrite( PWMb, 249 );
+        analogWrite( PWMa, 254 );
+        digitalWrite(motor11, HIGH);
+        digitalWrite(motor22, LOW);
+        digitalWrite(motor12, LOW);
+        digitalWrite(motor21, HIGH);
+        delay(t);
+
+        digitalWrite(motor11, LOW);
+        digitalWrite(motor21, LOW);
+
+      }
     }
   }
-  digitalWrite(motor12, LOW);
-  digitalWrite(motor22, LOW);
 
-
-  while (abs(theta - theta0 - kakudo) > 5) {
-    double omega = (theta - theta0) / microt;
-    theta = qmc5883();
-    int difference = theta - theta0 - kakudo;
-    int t = difference / omega;
-    if ( theta - theta0 - kakudo > 0) {
-      analogWrite( PWMb, 249 );
-      analogWrite( PWMa, 254 );
-      digitalWrite(motor11, LOW);
-      digitalWrite(motor22, HIGH);
-      digitalWrite(motor12, HIGH);
-      digitalWrite(motor21, LOW);
-      delay(t);
-
-      digitalWrite(motor12, LOW);
-      digitalWrite(motor22, LOW);
+  void left_rotate( int kakudo ) {
+    int theta0 = qmc5883();
+    int theta = theta0;
+    unsigned long microt = 0;
+    microt = millis();
+    analogWrite( PWMb, 249 );
+    analogWrite( PWMa, 254 );
+    digitalWrite(motor11, LOW);
+    digitalWrite(motor22, HIGH);
+    digitalWrite(motor12, HIGH);
+    digitalWrite(motor21, LOW);
+    while (theta0 - theta < kakudo) {
+      if (qmc5883() > theta0) {
+        theta = qmc5883() - 360;
+      }
+      else {
+        theta = qmc5883();
+      }
     }
-    else {
-      analogWrite( PWMb, 249 );
-      analogWrite( PWMa, 254 );
-      digitalWrite(motor11, HIGH);
-      digitalWrite(motor22, LOW);
-      digitalWrite(motor12, LOW);
-      digitalWrite(motor21, HIGH);
-      delay(t);
+    digitalWrite(motor12, LOW);
+    digitalWrite(motor22, LOW);
 
-      digitalWrite(motor11, LOW);
-      digitalWrite(motor21, LOW);
 
+    while (abs(theta - theta0 - kakudo) > 5) {
+      double omega = (theta - theta0) / microt;
+      theta = qmc5883();
+      int difference = theta - theta0 - kakudo;
+      int t = difference / omega;
+      if ( theta - theta0 - kakudo > 0) {
+        analogWrite( PWMb, 249 );
+        analogWrite( PWMa, 254 );
+        digitalWrite(motor11, LOW);
+        digitalWrite(motor22, HIGH);
+        digitalWrite(motor12, HIGH);
+        digitalWrite(motor21, LOW);
+        delay(t);
+
+        digitalWrite(motor12, LOW);
+        digitalWrite(motor22, LOW);
+      }
+      else {
+        analogWrite( PWMb, 249 );
+        analogWrite( PWMa, 254 );
+        digitalWrite(motor11, HIGH);
+        digitalWrite(motor22, LOW);
+        digitalWrite(motor12, LOW);
+        digitalWrite(motor21, HIGH);
+        delay(t);
+
+        digitalWrite(motor11, LOW);
+        digitalWrite(motor21, LOW);
+
+      }
     }
   }
-}
 
-void setup() {
-  setup_qmc5883();
-  setup_motor();
-  Serial.begin(9600);
-}
-void loop() {
-  right_rotate( 90 );
-}
+  void setup() {
+    setup_qmc5883();
+    setup_motor();
+    Serial.begin(9600);
+  }
+  void loop() {
+    right_rotate( 90 );
+  }
