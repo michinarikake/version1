@@ -93,6 +93,8 @@ const int motor11 = 2;
 const int motor12 = 3;
 const int motor21 = 6;
 const int motor22 = 5;
+const int PWMa = A4;
+const int PWMb = A5;
 const int pinA = 7;
 const int pinB = 8;
 int encoderPosCount = 0;
@@ -110,13 +112,14 @@ void straight( int l ){
   int encoderPosCount = 0;
   int pinALast = digitalRead(pinA);
   int aVal;
+  analogWrite( PWMa, 255 );
+  analogWrite( PWMb, 249 );
   digitalWrite(motor11, LOW);
   digitalWrite(motor22, LOW);
   digitalWrite(motor12, HIGH);
   digitalWrite(motor21, HIGH);
-  analogWrite( PWM, 249 );
   
-  while (-encoderPosCount < l * 1000 / 3925 ) {
+  while (-encoderPosCount < l * 40 / 15.707 ) {
     aVal = digitalRead(pinA);
     if (aVal != pinALast) {
       //回ってたらピンAの値が変わるためエンコーダーの値を増やす
@@ -140,19 +143,21 @@ void straight( int l ){
 //setup、ピンの名前は省略
 //tはミリ秒
 void turn_right(){
+  analogWrite( PWMa, 150 );
+  analogWrite( PWMb, 150 );
   digitalWrite(motor11, HIGH);
   digitalWrite(motor22, LOW);
   digitalWrite(motor12, LOW);
   digitalWrite(motor21, HIGH);
-  analogWrite( PWM, 249 );
 }
 
 void turn_left(){
+  analogWrite( PWMa, 150 );
+  analogWrite( PWMb, 150 );
   digitalWrite(motor11, LOW);
   digitalWrite(motor22, HIGH);
   digitalWrite(motor12, HIGH);
   digitalWrite(motor21, LOW);
-  analogWrite( PWM, 249 );
 }
 
 void stop(){
@@ -167,11 +172,12 @@ void back( int l ){
   int encoderPosCount = 0;
   int pinALast = digitalRead(pinA);
   int aVal;
+  analogWrite( PWMa, 150 );
+  analogWrite( PWMb, 150 );
   digitalWrite(motor11, HIGH);
   digitalWrite(motor22, HIGH);
   digitalWrite(motor12, LOW);
   digitalWrite(motor21, LOW);
-  analogWrite( PWM, 249 );
   
   while (encoderPosCount < l * 1000 / 3925) {
     aVal = digitalRead(pinA);
@@ -229,54 +235,4 @@ const int SV_PIN2 = 10;
 void setup_servo() {
   myservo1.attach(SV_PIN1, 500, 2400);  // サーボの割当(パルス幅500~2400msに指定)距離せんさ
   myservo2.attach(SV_PIN2, 500, 2400); //プーリー用
-}
-
-void setup() {
-  Serial.begin(9600);
-  setup_encorder();
-  setup_mpu6050();
-  setup_ultrasonic();
-  setup_servo();
-}
-
-void loop() {
-  myservo2.write(0);
-  delay(1000);
-  encorder(1000); //1000だけ直進
-  myservo2.write(70); //プーリー上げる
-  delay(2000);
-
-  //障害物探知
-  for ( int i = 0; i < 12; i++) {
-    for ( int j = 0; j < 100; j++) {
-      digitalWrite(trigPin, LOW);
-      digitalWrite(echoPin, LOW);
-      delayMicroseconds(1);
-      digitalWrite(trigPin, HIGH);
-      delayMicroseconds(10);
-      digitalWrite(trigPin, LOW);
-      duration = pulseIn(echoPin, HIGH);
-      distance += duration * 0.000001 * 34000 / 2;
-    }
-    digitalWrite(trigPin, LOW);
-    digitalWrite(echoPin, LOW);
-    distance = distance * 0.01;//１００個の平均を取る
-    Serial.print("distance");
-    Serial.print(distance);
-    Serial.print("angle");
-    Serial.println(i * 15);
-    myservo1.write(i * 15);  // サーボモーターを15*i度の位置まで動かす
-    delay(2000);
-  }
-  //旋回
-  digitalWrite(motor11, LOW);
-  digitalWrite(motor12, HIGH);
-  digitalWrite(motor22, HIGH);
-  digitalWrite(motor21, LOW);
-  int a = qmc5883();
-  while (a < 170) {
-    a = qmc5883();
-  }
-  digitalWrite(motor12, LOW);
-  digitalWrite(motor22, LOW);
 }
